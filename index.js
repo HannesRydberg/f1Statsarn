@@ -1,17 +1,16 @@
 let axios = require('axios')
 let config = require('./config')
 
-let teamData = "";
+let messageString = "";
 let slackWebhookUrl = config.webHookUrl
 
 let getLeaderboardData = (callback) => {
   axios.get(config.dataSourceUrl)
     .then((response) => {
       let entrants = response.data.leaderboard.leaderboard_entrants
-      let newTeamData = JSON.stringify(entrants)
-      if(newTeamData != teamData){
-        teamData = newTeamData
-        let messageString = createMessageString(entrants)
+      let newMessageString = createMessageString(entrants)
+      if(messageString != newMessageString){
+        messageString = newMessageString
         console.log(messageString)
         axios.post(slackWebhookUrl, {
           text: messageString,
@@ -20,10 +19,10 @@ let getLeaderboardData = (callback) => {
         }).then((response) => {
           console.log("Data sent to webhook\n")
         }).catch((error) => {
-          console.error()
+          console.log(error)
         })
       } else {
-        console.log("No new data")
+        console.log("no new data")
       }
       setTimeout(() => {callback(callback)}, 600000)
     })
